@@ -8,7 +8,7 @@ interface Tarefa {
 }
 //define a interface da tarefa 
 
-async function adicionarTarefa(novaTarefa: Tarefa) {
+async function adicionarTarefa(tituloDigitado: string) { // Ajustado o nome do parâmetro
     let listaAtual: Tarefa[] = [];
 
     try {
@@ -25,15 +25,29 @@ async function adicionarTarefa(novaTarefa: Tarefa) {
         console.log('criando novo banco de dados local');
     } 
 
+    // --- id auto ---
+
+    // Se a lista tiver itens, pega o ID do último e soma 1. Se não, começa em 1.
+    const novoId = listaAtual.length > 0 
+        ? listaAtual[listaAtual.length - 1]!.id + 1 
+        : 1;
+
+    const objetoTarefa: Tarefa = { // Mudado o nome para evitar conflito
+        id: novoId,
+        titulo: tituloDigitado,
+        concluido: false // toda tarefa nova começa como pendente
+    };
+    // -------------------------------
+
     // adiciona o novo objeto ao Array
-    listaAtual.push(novaTarefa);
+    listaAtual.push(objetoTarefa);
 
     const conteudo = JSON.stringify(listaAtual, null, 2);
     //converte o objeto tarefa para uma string JSON
 
     try {
         await fs.writeFile('tarefa.json', conteudo);
-        console.log(`Tarefa "${novaTarefa.titulo}" gravada com sucesso`);
+        console.log(`Tarefa "${objetoTarefa.titulo}" gravada com sucesso`);
     }
     //tenta escrever o arquivo tarefa.json
     catch (erro) {
@@ -42,28 +56,9 @@ async function adicionarTarefa(novaTarefa: Tarefa) {
     //se der errado cai aqui
 }
 
-//exemplos para testar o array
-const tarefa1: Tarefa = {
-    id: 1,
-    titulo: "make todo in node",
-    concluido: true
-};
-
-const tarefa2: Tarefa = {
-    id: 2,
-    titulo: "commit in git",
-    concluido: true
-};
-
-const tarefa3: Tarefa = {
-    id: 3,
-    titulo: "make readme",
-    concluido: false
-};
-
 // Função autoinvocavel para rodar as gravçoes em sequencia
 (async () => {
-    await adicionarTarefa(tarefa1);
-    await adicionarTarefa(tarefa2);
-    await adicionarTarefa(tarefa3); 
+    await adicionarTarefa("create todo in node");
+    await adicionarTarefa("commit in github");
+    await adicionarTarefa("make readme"); 
 })();
