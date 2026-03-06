@@ -29,9 +29,24 @@ async function adicionarTarefa(tituloDigitado: string): Promise<Tarefa> {
     return novaTarefa;
 }
 
+// registra o que aconteceu no servidor em um arquivo de log sem apagar o anterior
+async function registrarLog(metodo: string, url: string) {
+    const data = new Date().toISOString();
+    const linhaLog = `[${data}] ${metodo} em ${url}\n`;
+
+    try {
+        await fs.appendFile('acesso.log', linhaLog);
+    } catch (err) {
+        console.error('erro ao salvar o log:', err);
+    }
+}
+
 // aqui a magica acontece: cria o servidor http nativo
 const server = http.createServer(async (req: IncomingMessage, res: ServerResponse) => {
     const { method, url } = req;
+
+    // dispara o log de forma asincrona (nao trava a resposta pro usuario)
+    registrarLog(method || 'desconhecido', url || 'desconhecido');
 
     // avisa que a resposta sempre sera um json (exceto pro robots.txt)
     res.setHeader('Content-Type', 'application/json');
@@ -39,10 +54,10 @@ const server = http.createServer(async (req: IncomingMessage, res: ServerRespons
     // redireciona ou avisa quando bate na raiz do localhost
     if (method === 'GET' && url === '/') {
         res.statusCode = 200;
-        return res.end(JSON.stringify({ mensagem: 'bem-vindo ao node-cli! tente acessar /tarefas ou /robots.txt' }));
+        return res.end(JSON.stringify({ mensagem: 'bem-vindo ao node-cli -- tente acessar /tarefas ou /robots.txt' }));
     }
 
-    // rota pro robots.txt pra facilitar a vida de quem abre o server
+    // rota pro robots.txt pra facilitar quem abre o server
     if (method === 'GET' && url === '/robots.txt') {
         res.setHeader('Content-Type', 'text/plain');
         res.statusCode = 200;
