@@ -36,6 +36,7 @@ async function registrarLog(metodo: string, url: string) {
 
     try {
         await fs.appendFile('acesso.log', linhaLog);
+        console.log(`log registrado: ${metodo} ${url}`);
     } catch (err) {
         console.error('erro ao salvar o log:', err);
     }
