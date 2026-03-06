@@ -42,7 +42,7 @@ async function registrarLog(metodo: string, url: string) {
     }
 }
 
-// aqui a magica acontece: cria o server http nativo
+// cria o server http nativo
 const server = http.createServer(async (req: IncomingMessage, res: ServerResponse) => {
     const { method, url } = req;
 
