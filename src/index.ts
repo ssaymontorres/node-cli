@@ -1,15 +1,15 @@
 import http, { IncomingMessage, ServerResponse } from 'node:http';
 import fs from 'node:fs/promises';
 
-// define como uma tarefa se parece no sistema
-interface Tarefa {
+// define como uma task se parece no sistema
+interface Task {
     id: number;
     titulo: string;
     concluido: boolean;
 }
 
-// le o arquivo json e retorna a lista de tarefas ou um array vazio se der erro
-async function listarTarefas(): Promise<Tarefa[]> {
+// le o arquivo json e retorna a lista de tasks ou um array vazio se der erro
+async function listarTasks(): Promise<Task[]> {
     try {
         const dadosBrutos = await fs.readFile('tarefa.json', 'utf-8');
         return JSON.parse(dadosBrutos);
@@ -46,7 +46,7 @@ async function registrarLog(metodo: string, url: string) {
 const server = http.createServer(async (req: IncomingMessage, res: ServerResponse) => {
     const { method, url } = req;
 
-    // dispara o log de forma asincrona (nao trava a resposta pro usuario)
+    // dispara o log de forma asincrona (nao trava a resposta pro user)
     registrarLog(method || 'desconhecido', url || 'desconhecido');
 
     // avisa que a resposta sempre sera um json (exceto pro robots.txt)
@@ -55,7 +55,7 @@ const server = http.createServer(async (req: IncomingMessage, res: ServerRespons
     // redireciona ou avisa quando bate na raiz do localhost
     if (method === 'GET' && url === '/') {
         res.statusCode = 200;
-        return res.end(JSON.stringify({ mensagem: 'bem-vindo ao node-cli -- tente acessar /tarefas ou /robots.txt' }));
+        return res.end(JSON.stringify({ mensagem: 'bem-vindo ao node-cli -- tente acessar /tasks ou /robots.txt' }));
     }
 
     // rota pro robots.txt pra facilitar quem abre o server
@@ -65,24 +65,24 @@ const server = http.createServer(async (req: IncomingMessage, res: ServerRespons
         return res.end('User-agent: *\nDisallow: /');
     }
 
-    // rota pra buscar todas as tarefas ja gravadas
-    if (method === 'GET' && url === '/tarefas') {
-        const tarefas = await listarTarefas();
+    // rota pra buscar todas as tasks ja gravadas
+    if (method === 'GET' && url === '/tasks') {
+        const tasks = await listarTasks();
         res.statusCode = 200;
-        return res.end(JSON.stringify(tarefas));
+        return res.end(JSON.stringify(tasks));
     }
 
-    // rota pra criar uma tarefa nova via post
-    if (method === 'POST' && url === '/tarefas') {
+    // rota pra criar uma task nova via post
+    if (method === 'POST' && url === '/tasks') {
         // no node puro o corpo da req chega em pedacos (streams)
         let body = '';
         req.on('data', (chunk: Buffer) => body += chunk.toString());
         req.on('end', async () => {
             try {
                 const { titulo } = JSON.parse(body);
-                const tarefaCriada = await adicionarTarefa(titulo);
+                const taskCriada = await adicionarTask(titulo);
                 res.statusCode = 201;
-                res.end(JSON.stringify(tarefaCriada));
+                res.end(JSON.stringify(taskCriada));
             } catch (err) {
                 res.statusCode = 400;
                 res.end(JSON.stringify({ erro: 'json invalido ou campo faltando' }));
