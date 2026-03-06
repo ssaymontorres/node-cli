@@ -33,8 +33,21 @@ async function adicionarTarefa(tituloDigitado: string): Promise<Tarefa> {
 const server = http.createServer(async (req: IncomingMessage, res: ServerResponse) => {
     const { method, url } = req;
 
-    // avisa que a resposta sempre sera um json
+    // avisa que a resposta sempre sera um json (exceto pro robots.txt)
     res.setHeader('Content-Type', 'application/json');
+
+    // redireciona ou avisa quando bate na raiz do localhost
+    if (method === 'GET' && url === '/') {
+        res.statusCode = 200;
+        return res.end(JSON.stringify({ mensagem: 'bem-vindo ao node-cli! tente acessar /tarefas ou /robots.txt' }));
+    }
+
+    // rota pro robots.txt pra facilitar a vida de quem abre o server
+    if (method === 'GET' && url === '/robots.txt') {
+        res.setHeader('Content-Type', 'text/plain');
+        res.statusCode = 200;
+        return res.end('User-agent: *\nDisallow: /');
+    }
 
     // rota pra buscar todas as tarefas ja gravadas
     if (method === 'GET' && url === '/tarefas') {
