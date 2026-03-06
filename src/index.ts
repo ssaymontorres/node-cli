@@ -29,7 +29,7 @@ async function adicionarTarefa(tituloDigitado: string): Promise<Tarefa> {
     return novaTarefa;
 }
 
-// registra o que aconteceu no servidor em um arquivo de log sem apagar o anterior
+// registra o que aconteceu no server em um arquivo de log sem apagar o anterior
 async function registrarLog(metodo: string, url: string) {
     const data = new Date().toISOString();
     const linhaLog = `[${data}] ${metodo} em ${url}\n`;
@@ -42,7 +42,7 @@ async function registrarLog(metodo: string, url: string) {
     }
 }
 
-// aqui a magica acontece: cria o servidor http nativo
+// aqui a magica acontece: cria o server http nativo
 const server = http.createServer(async (req: IncomingMessage, res: ServerResponse) => {
     const { method, url } = req;
 
