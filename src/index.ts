@@ -18,15 +18,15 @@ async function listarTarefas(): Promise<Tarefa[]> {
     }
 }
 
-// pega o titulo, gera um id novo e salva a tarefa no json
-async function adicionarTarefa(tituloDigitado: string): Promise<Tarefa> {
-    const listaAtual = await listarTarefas();
+// pega o titulo, gera um id novo e salva a task no json
+async function adicionarTask(tituloDigitado: string): Promise<Task> {
+    const listaAtual = await listarTasks();
     const novoId = listaAtual.length > 0 ? listaAtual[listaAtual.length - 1]!.id + 1 : 1;
-    const novaTarefa: Tarefa = { id: novoId, titulo: tituloDigitado, concluido: false };
+    const novaTask: Task = { id: novoId, titulo: tituloDigitado, concluido: false };
 
-    listaAtual.push(novaTarefa);
+    listaAtual.push(novaTask);
     await fs.writeFile('tarefa.json', JSON.stringify(listaAtual, null, 2));
-    return novaTarefa;
+    return novaTask;
 }
 
 // registra o que aconteceu no server em um arquivo de log sem apagar o anterior
